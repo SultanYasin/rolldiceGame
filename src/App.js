@@ -1,71 +1,46 @@
-import React from 'react'
-import Die from './Components/Die'
-import './App.css'
+import React from "react";
+import "./App.css";
+import Die from "./Components/Die";
+import { nanoid } from "nanoid";
 
 export default function App() {
-  const [dice , setDice] = React.useState(allDice())
+  const [dice, setDice] = React.useState(allNewDice());
 
-  //what this fuction do is generate random values and put it inside the die everytime the page is loaded
-  function allDice(){
-    //making a new array that contaisns the values of the die
-    let newDice = []
-     // to generate a number between 1 & 6 to push it to the newDice Array
-    for (let i = 0; i < 10; i++) newDice.push(Math.ceil(Math.random() *  6))
-    return newDice
+  function allNewDice() {
+    // everytime I'm calling this function, it creating an array of objects
+    const newDice = [];
+    // pushing an object that have random value and uniqe key to the array
+    for (let i = 0; i < 10; i++) {
+      newDice.push({
+        value: Math.ceil(Math.random() * 6),
+        isHeld: false,
+        id: nanoid(),
+      });
+    }
+    return newDice;
   }
 
-  // this function is to re-render the dice (similar to refresh the page) by using the setDice which its work is to reset the dice 
-  function rollDice(){setDice(allDice())} 
-    
-  
+  //used to re-render the dice when the user clicks the roll button
+  function rollDice() {
+    setDice(allNewDice());
+  }
 
-const diceElement = dice.map(die => <Die value = {die}/>)
+    //inside of the map I'll look to each die object that if it is the same die 
+    //with property(id) that was passed into the function then I'll update that object
+  function holdDice(id) {
+    setDice(prevDice => prevDice.map(die => {return die.id === id ? {...die , isHeld : !die.isHeld} : die}))
+  }
 
-
-  return (
-  <main className="App">
-    <div className='dice-container'> {diceElement} </div>
-    <button className='roll-dice' onClick={rollDice}>Roll</button>
-  </main>
-  )
-}
-
-
-
-
-
-
-
-/*
-import React from 'react';
-import './App.css';
-import Die from './Components/Die';
-
-
-export default function App() {
-  const [dice , setDice] = React.useState(allNewDice())
-
-// this function is used to generate a  random number 1>6
-function allNewDice(){
-  const newDice=[]
-  for(let i = 0 ; i<10 ; i++)  newDice.push(Math.ceil(Math.random() * 6)) 
-  return newDice
-}
-
-const diceElement = dice.map(die => <Die value={die}/>)
-
+  const diceElements = dice.map((die) => (
+    <Die key={die.id} value={die.value} isHeld={die.isHeld} holdDice={()=>holdDice(die.id)} />
+  ));
 
   return (
-    <main className="App">
-
-      <div className="dice-container">
-        {diceElement}
-      
-      </div>
-
+    <main>
+      <div className="dice-container">{diceElements}</div>
+      <button className="roll-dice" onClick={rollDice}>
+        Roll
+      </button>
     </main>
   );
 }
-
-
-*/
